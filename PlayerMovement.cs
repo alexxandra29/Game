@@ -11,34 +11,48 @@ public class PlayerMovement : MonoBehaviour
 
     float horizontalMove = 0f;
     bool jump = false;
-    bool crouch = false;
+    //bool crouch = false;
     // Update is called once per frame
+
+    GameManagerScript gm;
+
+    void Start()
+    {
+        gm = GameObject.Find("GameManager").GetComponent<GameManagerScript>();
+    }
     void Update()
     {
         horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
 
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
-        if(Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && jump == false)
         {
             jump = true;
-           // animator.SetBool("IsJumping", true); 
+            animator.SetBool("IsJumping", true);
         }
-        //if(Input.GetButtonDown("Crouch"))
-        //{
-        //    crouch = true;
-        //}else if(Input.GetButtonUp("Crouch"))
-        //{
-        //    crouch = false;
-        //}
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            runSpeed = 2000;
+        }
     }
 
-    //public void OnLanding()
-    //{
-    //    animator.SetBool("IsJumping", false);
-    //}
+    public void OnLanding()
+    {
+        animator.SetBool("IsJumping", false);jump = false;
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.tag=="coin")
+        {
+            gm.CoinCollected();
+            Destroy(other.gameObject);
+        }
+    }
+
     void FixedUpdate()
     {
         controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);
-        jump = false;
+        
     }
 }
